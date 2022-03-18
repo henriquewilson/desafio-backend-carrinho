@@ -1,8 +1,5 @@
 package br.com.geofusion.cart.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -82,7 +79,13 @@ public class Item {
         return id;
     }
 
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
 
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }
 
 

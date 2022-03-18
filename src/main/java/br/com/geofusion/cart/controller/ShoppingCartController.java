@@ -8,21 +8,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/cart")
 public class ShoppingCartController {
 
     @Autowired
     private ShoppingCartRepository shoppingCartRepository;
 
-
     ShoppingCartController() {
     }
 
-    @PostMapping(path = "/cart/{clientId}/add-item")
+    @PostMapping(path = "/{clientId}/remove-item")
+    public @ResponseBody
+    ShoppingCart removeItem(@RequestBody Item item, @PathVariable String clientId) {
+        try {
+            ShoppingCart cart = shoppingCartRepository.findByClientId(clientId).get(0);
+            cart.removeItem(item.getProduct());
+            return this.shoppingCartRepository.save(cart);
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "clientId  cannot be empty", e);
+        }
+    }
+
+    @PostMapping(path = "/{clientId}/add-item")
     public @ResponseBody
     ShoppingCart addNewItem(@RequestBody Item item, @PathVariable String clientId) {
         try {
@@ -35,7 +46,7 @@ public class ShoppingCartController {
         }
     }
 
-    @GetMapping(path = "/cart/{clientId}")
+    @GetMapping(path = "/{clientId}")
     public @ResponseBody
     ShoppingCart addNewShoppingCart(@PathVariable String clientId) {
         if (clientId == null) {
@@ -45,7 +56,18 @@ public class ShoppingCartController {
         return new ShoppingCartFactory(this.shoppingCartRepository).create(clientId);
     }
 
-    @GetMapping(path = "/cart/{clientId}/items")
+    @GetMapping(path = "/{clientId}/logout")
+    public @ResponseBody
+    boolean logoutShoppingCart(@PathVariable String clientId) {
+        if (clientId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "clientId  cannot be empty");
+        }
+        return new ShoppingCartFactory(this.shoppingCartRepository).invalidate(clientId);
+    }
+
+
+    @GetMapping(path = "/{clientId}/items")
     public @ResponseBody
     Collection<Item> allItemsByCart(@PathVariable String clientId) {
         try {
@@ -55,11 +77,5 @@ public class ShoppingCartController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "clientId  cannot be empty", e);
         }
-    }
-
-    @GetMapping(path = "/all-carts")
-    public @ResponseBody
-    Iterable<ShoppingCart> getAllItems() {
-        return shoppingCartRepository.findAll();
     }
 }

@@ -57,15 +57,21 @@ public class ShoppingCart {
             throw new RuntimeException("unitPrice and quantity must be greater than zero");
         }
 
-
         if (this.items == null) {
             this.items = new ArrayList<>();
         }
-        this.items.add(new Item(product, unitPrice, quantity));
+        Item item = this.items.stream()
+                .filter(ii -> ii.getProduct().getCode() == product.getCode())
+                .findAny()
+                .orElse(null);
 
-        String s = String.valueOf(1);
-
-
+        if (item == null) {
+            item = new Item(product, unitPrice, quantity);
+            this.items.add(item);
+        } else {
+            item.setQuantity(item.getQuantity() + quantity);
+            item.setUnitPrice(unitPrice);
+        }
     }
 
     /**
