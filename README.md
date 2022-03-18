@@ -1,3 +1,13 @@
+## Notas do dev
+Antes de executar, edite o arquivo `src/main/resources/application.properties` alterado com as credenciais para acesso ao MySQL
+
+
+### Executar o projeto
+
+execute no terminal o arquivo presente na raiz do projeto `sh run.sh`
+
+
+
 ## Atenção
 Nesta prova será necessário implementar os métodos das classes conforme descrições dos Javadocs correspondentes.
 
