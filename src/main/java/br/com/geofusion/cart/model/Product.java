@@ -1,4 +1,10 @@
-package br.com.geofusion.cart;
+package br.com.geofusion.cart.model;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.math.BigDecimal;
 
 /**
  * Classe que representa um produto que pode ser adicionado
@@ -7,9 +13,13 @@ package br.com.geofusion.cart;
  * Importante: Dois produtos são considerados iguais quando ambos possuem o
  * mesmo código.
  */
+@Entity
 public class Product {
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long code;
+
     private String description;
 
     /**
@@ -18,7 +28,16 @@ public class Product {
      * @param code
      * @param description
      */
-    public Product(Long code, String description) {
+    public Product(Long code, String description) throws RuntimeException {
+        this.code = code;
+        if (description== null || description.equals("")) {
+            throw new RuntimeException("description cannot be null or empty");
+        }
+        this.description = description;
+    }
+
+    protected Product() {
+
     }
 
     /**
@@ -38,5 +57,6 @@ public class Product {
     public String getDescription() {
         return this.description;
     }
+
 
 }

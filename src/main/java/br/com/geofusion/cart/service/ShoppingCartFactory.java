@@ -1,22 +1,33 @@
-package br.com.geofusion.cart;
+package br.com.geofusion.cart.service;
+
+import br.com.geofusion.cart.model.ShoppingCart;
+import br.com.geofusion.cart.repository.ShoppingCartRepository;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 /**
  * Classe responsável pela criação e recuperação dos carrinhos de compras.
  */
 public class ShoppingCartFactory {
 
+    private ShoppingCartRepository shoppingCartRepository;
+
     /**
      * Cria e retorna um novo carrinho de compras para o cliente passado como parâmetro.
-     *
+     * <p>
      * Caso já exista um carrinho de compras para o cliente passado como parâmetro, este carrinho deverá ser retornado.
      *
      * @param clientId
      * @return ShoppingCart
      */
     public ShoppingCart create(String clientId) {
-        return null;
+        Collection collection = this.shoppingCartRepository.findByClientId(clientId);
+        if (collection.size() > 0) {
+            return (ShoppingCart) collection.iterator().next();
+        }
+        ShoppingCart cart = new ShoppingCart(clientId);
+        return this.shoppingCartRepository.save(cart);
     }
 
     /**
@@ -41,6 +52,12 @@ public class ShoppingCartFactory {
      * e false caso o cliente não possua um carrinho.
      */
     public boolean invalidate(String clientId) {
+        Collection collection = this.shoppingCartRepository.findByClientId(clientId);
+        if (collection.size() > 0) {
+            ShoppingCart cart = (ShoppingCart) collection.iterator().next();
+            this.shoppingCartRepository.delete(cart);
+            return true;
+        }
         return false;
     }
 }

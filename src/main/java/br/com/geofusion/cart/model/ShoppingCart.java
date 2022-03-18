@@ -1,25 +1,45 @@
-package br.com.geofusion.cart;
+package br.com.geofusion.cart.model;
 
-
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Classe que representa o carrinho de compras de um cliente.
  */
+@Entity
 public class ShoppingCart {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    private String clientId;
+
+    @OneToMany(targetEntity = Item.class, mappedBy = "product", fetch = FetchType.EAGER)
     private List<Item> items;
+
+    public ShoppingCart(Integer id, List<Item> items) {
+        this.id = id;
+        this.items = items;
+    }
+
+    protected ShoppingCart() {
+
+    }
+
+    public ShoppingCart(String clientId) {
+        this.clientId = clientId;
+    }
 
     /**
      * Permite a adição de um novo item no carrinho de compras.
-     *
+     * <p>
      * Caso o item já exista no carrinho para este mesmo produto, as seguintes regras deverão ser seguidas:
      * - A quantidade do item deverá ser a soma da quantidade atual com a quantidade passada como parâmetro.
      * - Se o valor unitário informado for diferente do valor unitário atual do item, o novo valor unitário do item deverá ser
      * o passado como parâmetro.
-     *
+     * <p>
      * Devem ser lançadas subclasses de RuntimeException caso não seja possível adicionar o item ao carrinho de compras.
      *
      * @param product
@@ -51,7 +71,18 @@ public class ShoppingCart {
      * caso o produto não exista no carrinho.
      */
     public boolean removeItem(int itemIndex) {
-        return false;
+        if (getItems().size() >= itemIndex) {
+            return false;
+        }
+        Iterator<Item> i = getItems().iterator();
+        int j = 0;
+        while(i.hasNext()) {
+            Item x = i.next();
+            if (j == itemIndex) {
+                i.remove();
+            }
+        }
+        return true;
     }
 
     /**
@@ -61,7 +92,13 @@ public class ShoppingCart {
      * @return BigDecimal
      */
     public BigDecimal getAmount() {
-        return null;
+        BigDecimal amount = BigDecimal.valueOf(0);
+        Iterator<Item> i = getItems().iterator();
+        while(i.hasNext()) {
+            Item x = i.next();
+            amount.add(x.getAmount());
+        }
+        return amount;
     }
 
     /**
@@ -70,6 +107,11 @@ public class ShoppingCart {
      * @return items
      */
     public Collection<Item> getItems() {
-        return null;
+        if (this.items == null) {
+            return Collections.emptyList();
+        }
+        return this.items;
     }
+
+
 }
