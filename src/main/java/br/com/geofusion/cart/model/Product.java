@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.math.BigDecimal;
 
 /**
  * Classe que representa um produto que pode ser adicionado
@@ -28,11 +27,8 @@ public class Product {
      * @param code
      * @param description
      */
-    public Product(Long code, String description) throws RuntimeException {
+    public Product(Long code, String description) {
         this.code = code;
-        if (description== null || description.equals("")) {
-            throw new RuntimeException("description cannot be null or empty");
-        }
         this.description = description;
     }
 

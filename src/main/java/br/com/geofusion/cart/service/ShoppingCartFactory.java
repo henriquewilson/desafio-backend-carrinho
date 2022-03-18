@@ -1,11 +1,14 @@
 package br.com.geofusion.cart.service;
 
+import br.com.geofusion.cart.model.Item;
 import br.com.geofusion.cart.model.ShoppingCart;
 import br.com.geofusion.cart.repository.ShoppingCartRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Classe responsável pela criação e recuperação dos carrinhos de compras.
@@ -46,7 +49,15 @@ public class ShoppingCartFactory {
      * @return BigDecimal
      */
     public BigDecimal getAverageTicketAmount() {
-        return null;
+        Iterator<ShoppingCart> iterator = this.shoppingCartRepository.findAll().iterator();
+        BigDecimal average = BigDecimal.ZERO;
+        int countCarts = 0;
+        while (iterator.hasNext()) {
+            average = average.add(iterator.next().getAmount());
+            countCarts++;
+        }
+        average = average.divide(BigDecimal.valueOf(countCarts), 4, RoundingMode.HALF_UP);
+        return scaleTwoDecimal(average);
     }
 
     /**
@@ -65,5 +76,11 @@ public class ShoppingCartFactory {
             return true;
         }
         return false;
+    }
+
+    private BigDecimal scaleTwoDecimal(BigDecimal bigDecimal) {
+        return bigDecimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.valueOf(0.5)) < 0 ?
+                bigDecimal.setScale(2, RoundingMode.HALF_DOWN) :
+                bigDecimal.setScale(2, RoundingMode.HALF_UP);
     }
 }

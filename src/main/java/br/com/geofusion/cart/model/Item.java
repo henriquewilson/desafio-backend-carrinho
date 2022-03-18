@@ -69,10 +69,11 @@ public class Item {
      */
     @Transient
     public BigDecimal getAmount() {
-        return BigDecimal.valueOf(0);
-//        if (unitPrice != null) {
-//        }
-//        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+        if (unitPrice == null || quantity == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal decimal = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public Integer getId() {

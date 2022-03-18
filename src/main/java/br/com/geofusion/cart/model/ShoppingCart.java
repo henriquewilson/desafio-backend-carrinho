@@ -60,6 +60,7 @@ public class ShoppingCart {
         if (this.items == null) {
             this.items = new ArrayList<>();
         }
+
         Item item = this.items.stream()
                 .filter(ii -> ii.getProduct().getCode() == product.getCode())
                 .findAny()
@@ -87,9 +88,9 @@ public class ShoppingCart {
         while (i.hasNext()) {
             Item x = i.next();
             if (x.getProduct().getCode() == product.getCode()) {
-                i.remove();
-                return true;
+                return removeItem(j);
             }
+            j++;
         }
         return false;
     }
@@ -105,17 +106,18 @@ public class ShoppingCart {
      */
     public boolean removeItem(int itemIndex) {
         if (this.getItems().size() >= itemIndex) {
-            return false;
-        }
-        Iterator<Item> i = this.getItems().iterator();
-        int j = 0;
-        while (i.hasNext()) {
-            Item x = i.next();
-            if (j == itemIndex) {
-                i.remove();
+            Iterator<Item> i = this.getItems().iterator();
+            int j = 0;
+            while (i.hasNext()) {
+                Item x = i.next();
+                if (j == itemIndex) {
+                    i.remove();
+                    return true;
+                }
+                j++;
             }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -125,11 +127,11 @@ public class ShoppingCart {
      * @return BigDecimal
      */
     public BigDecimal getAmount() {
-        BigDecimal amount = BigDecimal.valueOf(0);
+        BigDecimal amount = BigDecimal.ZERO;
         Iterator<Item> i = this.getItems().iterator();
         while (i.hasNext()) {
-            Item x = i.next();
-            amount.add(x.getAmount());
+            BigDecimal x = i.next().getAmount();
+            amount = amount.add(x);
         }
         return amount;
     }

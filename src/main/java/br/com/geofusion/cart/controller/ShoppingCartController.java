@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -25,7 +28,11 @@ public class ShoppingCartController {
     ShoppingCart removeItem(@RequestBody Item item, @PathVariable String clientId) {
         try {
             ShoppingCart cart = shoppingCartRepository.findByClientId(clientId).get(0);
-            cart.removeItem(item.getProduct());
+            boolean b = cart.removeItem(item.getProduct());
+            if (!b) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "item not found");
+            }
             return this.shoppingCartRepository.save(cart);
         } catch (Exception e) {
             throw new ResponseStatusException(
@@ -69,10 +76,33 @@ public class ShoppingCartController {
 
     @GetMapping(path = "/{clientId}/items")
     public @ResponseBody
-    Collection<Item> allItemsByCart(@PathVariable String clientId) {
+    Collection<Item> allItemsPerCart(@PathVariable String clientId) {
         try {
             ShoppingCart cart = shoppingCartRepository.findByClientId(clientId).get(0);
             return cart.getItems();
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "clientId  cannot be empty", e);
+        }
+    }
+
+    @GetMapping(path = "/{clientId}/total")
+    public @ResponseBody
+    BigDecimal totalPerCart(@PathVariable String clientId) {
+        try {
+            ShoppingCart cart = shoppingCartRepository.findByClientId(clientId).get(0);
+            return cart.getAmount();
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "clientId  cannot be empty", e);
+        }
+    }
+
+    @GetMapping(path = "/average")
+    public @ResponseBody
+    BigDecimal averageTicketAmountPerCart() {
+        try {
+            return new ShoppingCartFactory(this.shoppingCartRepository).getAverageTicketAmount();
         } catch (Exception e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "clientId  cannot be empty", e);
