@@ -1,8 +1,6 @@
 package br.com.geofusion.cart.controller;
 
-import br.com.geofusion.cart.model.Item;
 import br.com.geofusion.cart.model.Product;
-import br.com.geofusion.cart.repository.ItemRepository;
 import br.com.geofusion.cart.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,8 @@
 package br.com.geofusion.cart.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -14,8 +16,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_code")
+    @OneToOne
     private Product product;
     private BigDecimal unitPrice;
     private Integer quantity;
@@ -27,17 +28,7 @@ public class Item {
      * @param unitPrice
      * @param quantity
      */
-    public Item(Product product, BigDecimal unitPrice, int quantity) throws RuntimeException {
-        if (product == null) {
-            throw new RuntimeException("Product cannot be null");
-        }
-        if (unitPrice == null) {
-            throw new RuntimeException("unitPrice cannot be null");
-        }
-        if (unitPrice.compareTo(BigDecimal.ZERO) <= 0 || quantity <= 0) {
-            throw new RuntimeException("unitPrice and quantity must be greater than zero");
-        }
-
+    public Item(Product product, BigDecimal unitPrice, int quantity) {
         this.product = product;
         this.unitPrice = unitPrice;
         this.quantity = quantity;
@@ -70,7 +61,7 @@ public class Item {
      *
      * @return int
      */
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
@@ -79,8 +70,12 @@ public class Item {
      *
      * @return BigDecimal
      */
+    @Transient
     public BigDecimal getAmount() {
-        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+        return BigDecimal.valueOf(0);
+//        if (unitPrice != null) {
+//        }
+//        return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public Integer getId() {

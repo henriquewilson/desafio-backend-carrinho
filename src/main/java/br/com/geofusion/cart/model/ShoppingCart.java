@@ -16,7 +16,7 @@ public class ShoppingCart {
 
     private String clientId;
 
-    @OneToMany(targetEntity = Item.class, mappedBy = "product", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Item.class, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
     public ShoppingCart(Integer id, List<Item> items) {
@@ -47,6 +47,24 @@ public class ShoppingCart {
      * @param quantity
      */
     public void addItem(Product product, BigDecimal unitPrice, int quantity) {
+        if (product == null) {
+            throw new RuntimeException("Product cannot be null");
+        }
+        if (unitPrice == null) {
+            throw new RuntimeException("unitPrice cannot be null");
+        }
+        if (unitPrice.compareTo(BigDecimal.ZERO) <= 0 || quantity <= 0) {
+            throw new RuntimeException("unitPrice and quantity must be greater than zero");
+        }
+
+
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        this.items.add(new Item(product, unitPrice, quantity));
+
+        String s = String.valueOf(1);
+
 
     }
 
@@ -58,6 +76,15 @@ public class ShoppingCart {
      * caso o produto não exista no carrinho.
      */
     public boolean removeItem(Product product) {
+        Iterator<Item> i = this.getItems().iterator();
+        int j = 0;
+        while (i.hasNext()) {
+            Item x = i.next();
+            if (x.getProduct().getCode() == product.getCode()) {
+                i.remove();
+                return true;
+            }
+        }
         return false;
     }
 
@@ -71,12 +98,12 @@ public class ShoppingCart {
      * caso o produto não exista no carrinho.
      */
     public boolean removeItem(int itemIndex) {
-        if (getItems().size() >= itemIndex) {
+        if (this.getItems().size() >= itemIndex) {
             return false;
         }
-        Iterator<Item> i = getItems().iterator();
+        Iterator<Item> i = this.getItems().iterator();
         int j = 0;
-        while(i.hasNext()) {
+        while (i.hasNext()) {
             Item x = i.next();
             if (j == itemIndex) {
                 i.remove();
@@ -93,8 +120,8 @@ public class ShoppingCart {
      */
     public BigDecimal getAmount() {
         BigDecimal amount = BigDecimal.valueOf(0);
-        Iterator<Item> i = getItems().iterator();
-        while(i.hasNext()) {
+        Iterator<Item> i = this.getItems().iterator();
+        while (i.hasNext()) {
             Item x = i.next();
             amount.add(x.getAmount());
         }
@@ -113,5 +140,11 @@ public class ShoppingCart {
         return this.items;
     }
 
+    public Integer getId() {
+        return id;
+    }
 
+    public String getClientId() {
+        return clientId;
+    }
 }

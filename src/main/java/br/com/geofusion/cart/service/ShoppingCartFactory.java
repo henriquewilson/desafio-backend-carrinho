@@ -2,6 +2,7 @@ package br.com.geofusion.cart.service;
 
 import br.com.geofusion.cart.model.ShoppingCart;
 import br.com.geofusion.cart.repository.ShoppingCartRepository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -9,9 +10,14 @@ import java.util.Collection;
 /**
  * Classe responsável pela criação e recuperação dos carrinhos de compras.
  */
+@Service
 public class ShoppingCartFactory {
 
     private ShoppingCartRepository shoppingCartRepository;
+
+    public ShoppingCartFactory(ShoppingCartRepository shoppingCartRepository) {
+        this.shoppingCartRepository = shoppingCartRepository;
+    }
 
     /**
      * Cria e retorna um novo carrinho de compras para o cliente passado como parâmetro.
